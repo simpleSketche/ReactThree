@@ -9,5 +9,24 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const scripts = [
+          'https://files.mcneel.com/rhino3dm/js/latest/rhino3dm.js'
+        ];
+
+        let script = document.createElement('script');
+        script.src = scripts[0]
+
+        document.head.appendChild(script)
+        script.onerror = (err) => {
+          console.log(err)
+        }
+        script.onload = () => {
+          window.Rhino3dm = window.rhino3dm();
+          console.log('Rhino3dm is loaded: ', window.Rhino3dm)
+        }
+      })
+    </script>
   </body>
 </html>

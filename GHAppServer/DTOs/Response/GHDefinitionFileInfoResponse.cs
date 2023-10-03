@@ -2,6 +2,6 @@
 {
     public class GHDefinitionFileInfoResponse
     {
-        public List<GHDefinitionDto> GHDefinitionList { get; set; }
+        public List<GHDefinitionNameDto> GHDefinitionList { get; set; }
     }
 }

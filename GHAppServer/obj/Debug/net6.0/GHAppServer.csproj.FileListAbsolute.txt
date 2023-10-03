@@ -30,3 +30,6 @@ C:\Users\Yankun.Yang\Documents\GitHub\ReactThree\GHAppServer\obj\Debug\net6.0\re
 C:\Users\Yankun.Yang\Documents\GitHub\ReactThree\GHAppServer\obj\Debug\net6.0\GHAppServer.pdb
 C:\Users\Yankun.Yang\Documents\GitHub\ReactThree\GHAppServer\obj\Debug\net6.0\GHAppServer.genruntimeconfig.cache
 C:\Users\Yankun.Yang\Documents\GitHub\ReactThree\GHAppServer\obj\Debug\net6.0\ref\GHAppServer.dll
+C:\Users\Yankun.Yang\Documents\GitHub\ReactThree\GHAppServer\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\Yankun.Yang\Documents\GitHub\ReactThree\GHAppServer\bin\Debug\net6.0\RhinoCompute.dll
+C:\Users\Yankun.Yang\Documents\GitHub\ReactThree\GHAppServer\bin\Debug\net6.0\RhinoCompute.pdb

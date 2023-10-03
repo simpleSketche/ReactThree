@@ -1,15 +1,39 @@
 {
   "version": 2,
-  "dgSpecHash": "AzKkBXqL3JNnXEWqEjOHPGzNy1qFLIODFRnxQVKbTi7a/pIwAmfIl3JBlhMtEv8HznYTDR91Qcs5XNB/SF0nAg==",
+  "dgSpecHash": "80ZyzrLOqC7pu6i2/VC6/jiXO4CS0xGLwrWbViDvRBlTJxVSTmw+Q6Skf0LMFaeDk71xBDKHrIhffjqVVFE1hg==",
   "success": true,
   "projectFilePath": "C:\\Users\\Yankun.Yang\\Documents\\GitHub\\ReactThree\\GHAppServer\\GHAppServer.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Yankun.Yang\\.nuget\\packages\\grasshopper\\7.32.23221.10241\\grasshopper.7.32.23221.10241.nupkg.sha512",
     "C:\\Users\\Yankun.Yang\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "C:\\Users\\Yankun.Yang\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\Yankun.Yang\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\Yankun.Yang\\.nuget\\packages\\rhinocommon\\7.32.23221.10241\\rhinocommon.7.32.23221.10241.nupkg.sha512",
     "C:\\Users\\Yankun.Yang\\.nuget\\packages\\swashbuckle.aspnetcore\\6.5.0\\swashbuckle.aspnetcore.6.5.0.nupkg.sha512",
     "C:\\Users\\Yankun.Yang\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.5.0\\swashbuckle.aspnetcore.swagger.6.5.0.nupkg.sha512",
     "C:\\Users\\Yankun.Yang\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.5.0\\swashbuckle.aspnetcore.swaggergen.6.5.0.nupkg.sha512",
     "C:\\Users\\Yankun.Yang\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.5.0\\swashbuckle.aspnetcore.swaggerui.6.5.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Grasshopper 7.32.23221.10241' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net6.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Grasshopper",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'RhinoCommon 7.32.23221.10241' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net6.0'. This package may not be fully compatible with your project.",
+      "libraryId": "RhinoCommon",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    }
+  ]
 }
