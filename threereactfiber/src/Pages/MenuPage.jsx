@@ -7,54 +7,38 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Button from '@mui/material/Button';
 import {fetchGHDefinitionFileNames, collectInputParams} from '../services/api.js'
 import { Link, useNavigate } from 'react-router-dom';
+import {useStore} from '../../Plugins/store.js'
+
 
 
 export default function MenuPage(){
 
-    const navigate = useNavigate();
+    const ghDefinitionList = useStore((state) => state.ghDefinitionList);
+    const getGhDefinitions = useStore((state) => state.getGhDefinitions);
 
-    const clickToScene = async (definitionName) => {
-      // getParams to collect UI control info of the selected gh definition
-      let requestDefinition = {
-        "DefinitionName":definitionName
-      }
-      const definitionInfo = await collectInputParams(requestDefinition)
-
-      console.log(definitionInfo)
-      // and navigate to the particular page route
-      navigate('/scene')
-    }
-
-    const Item = styled(Paper)(({ theme }) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-        ...theme.typography.body2,
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-      }));
-
+    const selGhDefinition = useStore((state) => state.selGhDefinition);
+    const getSelGhDefinition = useStore((state) => state.setSelGhDefinition);
+    
     const [ghDefinitionFilesNames, setGhDefinitionFilesNames] = useState([]);
 
-    useEffect(() => {
-        async function fetchData() {
-          try {
-            const result = await fetchGHDefinitionFileNames();
-            setGhDefinitionFilesNames(result["ghDefinitionList"])
-            // setData(result);
-          } catch (error) {
-            console.error('Error fetching data:', error);
-          }
-        }
-    
-        fetchData(); 
-    
-      }, []);
+    const navigate = useNavigate();
+
+    const clickToScene = async(definitionName) => {
+      // getParams to collect UI control info of the selected gh definition
+      await getSelGhDefinition(definitionName)
+      // and navigate to the particular page route
+      navigate(`/scene/${definitionName}`)
+    }
 
     useEffect(() => {
-      console.log(ghDefinitionFilesNames);
-    }, [ghDefinitionFilesNames]);
+      getGhDefinitions();
+    }, [])
 
-  
+    useEffect(() => {
+      setGhDefinitionFilesNames(ghDefinitionList)
+    }, [ghDefinitionList])
+
+    
     const containerStyle = {
       'minHeight': '100vh'
     }
@@ -66,7 +50,7 @@ export default function MenuPage(){
                   {ghDefinitionFilesNames ? (
                       ghDefinitionFilesNames.map((item, index) => (
                           <Grid xs={3} key={index}>
-                              <Button variant="contained" color="success" onClick={() => clickToScene(item.name)}>{item.name}</Button>
+                              <Button variant="contained" color="success" onClick={async() => clickToScene(item.name)}>{item.name}</Button>
                           </Grid>
                       ))
                       ) : (

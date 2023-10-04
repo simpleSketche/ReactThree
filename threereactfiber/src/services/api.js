@@ -11,8 +11,6 @@ export async function apiPost(endpoint, arglist, returnedJson=true){
         }
     }
 
-    console.log(request)
-
     let resp = await fetch(process.env.REACT_APP_API_URL + endpoint, request)
     if(returnedJson){
         return await resp.json()
@@ -52,7 +50,6 @@ export const collectInputParams = async (arg) => {
 
 export const solveParams = async(args) => {
 
-    console.log(args)
     const endpoint = 'GHDefinitions/SolveCompute'
     try{
         const result = await apiPost(endpoint, args)

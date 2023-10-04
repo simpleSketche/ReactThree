@@ -1,17 +1,20 @@
 import { useThree, extend, useFrame } from "@react-three/fiber"
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import {OrbitControls} from'three/examples/jsm/controls/OrbitControls.js'
 import SceneObject from '../Components/SceneObject.jsx'
+import {useStore} from '../../Plugins/store.js'
+import { useParams } from 'react-router-dom';
 
 // inherit the orbitcontrols in react three fiber due to the orbitcontrol is not natively part of threejs
 extend({OrbitControls})
 
-export default function World(){
+export default function World(props){
+
+    const {definitionInfo} = props;
 
     const {camera, gl, controls, scene} = useThree();
     const cubeRef = useRef()
     const groupRef = useRef()
-
 
     // access each animation frame
     useFrame((state, delta) => {
@@ -19,7 +22,6 @@ export default function World(){
         cubeRef.current.rotation.y += 0.01
     })
 
-    console.log(OrbitControls)
 
     return <>
 
@@ -28,7 +30,7 @@ export default function World(){
         <directionalLight position={[1,2,3]} intensity={1.5}/>
         <ambientLight intensity={0.5}/>
 
-        <SceneObject/>
+        <SceneObject definitionInfo={definitionInfo}/>
 
         <group ref={groupRef}>
             <mesh  position={[-3,0,0]}>

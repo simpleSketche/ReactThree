@@ -3,26 +3,15 @@ import React, { useState, useRef,useEffect } from 'react';
 import * as THREE from 'three'
 import {fetchGHDefinitionFileNames, collectInputParams, solveParams} from '../services/api.js'
 import { Rhino3dmLoader } from 'three/examples/jsm/loaders/3DMLoader'
-import Rhino from '../Plugins/rhino.js'
-
-
-const clearScene = () => {
-    const {scene} = useThree();
-
-    scene.traverse = () => {
-        scene.traverse(child => {
-            if(!child.isLight){
-                scene.remove(child)
-            }
-        })
-    }
-}
+import Rhino from '../../Plugins/rhino.js'
+import UITemplate from './UITemplate.jsx';
+import { Typography } from '@mui/material';
 
 const GHGeo = (props) => {
     const { data } = props
     const {scene} = useThree();
     const groupRef = useRef()
-
+    console.log(props)
     return <>
         {   
             data.length > 0 && data.map((o, i) => {
@@ -37,57 +26,42 @@ const GHGeo = (props) => {
     </>
 }
 
-const zoomCameraToSelection = (camera, controls, scene,fitOffset = 1.2) => {
-    
-    const selection = scene.children
-    const box = new THREE.Box3();
-  
-    for (const object of selection) {
-      if (object.isLight) continue;
-      box.expandByObject(object);
-    }
-  
-    const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
-  
-    const maxSize = Math.max(size.x, size.y, size.z);
-    const fitHeightDistance = maxSize / (2 * Math.atan((Math.PI * camera.fov) / 360));
-    const fitWidthDistance = fitHeightDistance / camera.aspect;
-    const distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
-    console.log(controls)
-    // const direction = controls.target
-    //   .clone()
-    //   .sub(camera.position)
-    //   .normalize()
-    //   .multiplyScalar(distance);
-  
-    // controls.maxDistance = distance * 10;
-    // controls.target.copy(center);
-  
-    // camera.near = distance / 100;
-    // camera.far = distance * 100;
-    // camera.updateProjectionMatrix();
-    // camera.position.copy(controls.target).sub(direction);
-  
-    // controls.update();
-  }
+export default function SceneObject(props){
 
-export default function SceneObject(){
+    const {definitionInfo} = props;
+    console.log(definitionInfo)
 
     const { camera, scene, gl } = useThree(); // access three objects
     const rhino = new Rhino();
 
     const [globalList, setGlobalList] = useState([]);
+    const [inputList, setInputList] = useState([]);
 
     // set up loader for converting the results to threejs
     const loader = new Rhino3dmLoader()
     loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' )
 
+    const clearScene = () => {
+        console.log("reset the scene")
+        scene.traverse = () => {
+            scene.traverse(child => {
+                if(!child.isLight){
+                    scene.remove(child)
+                }
+            })
+        }
+    }
+
     const assignInputs = (inputs) => {
 
+        setInputList([...inputList, inputs])
+        console.log(inputs)
         const requestInputs = []
 
+        console.log(inputs)
+
         inputs.map((input) => {
+            console.log(input)
             input.value = input.value ? input.value : input.default.value
             let curInput = {
                 "Value": input.value
@@ -95,6 +69,7 @@ export default function SceneObject(){
 
             requestInputs.push(curInput)
         })
+        console.log(requestInputs)
         return requestInputs
     }
 
@@ -142,47 +117,56 @@ export default function SceneObject(){
         
     }
 
-    const Solve = async (definitionName) => {
-        // getParams to collect UI control info of the selected gh definition
-        let requestDefinition = {
-            DefinitionName:definitionName
-        }
-        const definitionInfo = await collectInputParams(requestDefinition)
-        
 
-        let requestInputs = assignInputs(definitionInfo.inputs)
-        let solveRequest = {
-            "Inputs": requestInputs,
-            "InputNames": definitionInfo.inputNames,
-            "DefinitionPath": definitionInfo.definitionPath
-        }
+    const Solve = async (definitionInfo) => {
 
-        try{
-            const solveRes = await solveParams(solveRequest)
-            let resultObj = await collectResults(solveRes)
-            return resultObj;
+        // first clear the scene
+        clearScene();
+        console.log(definitionInfo)
+        if(definitionInfo && definitionInfo.hasOwnProperty("inputs")){
+            let requestInputs = assignInputs(definitionInfo.inputs)
             
+            let solveRequest = {
+                "Inputs": requestInputs,
+                "InputNames": definitionInfo.inputNames,
+                "DefinitionPath": definitionInfo.definitionPath
+            }
+
+            console.log(solveRequest)
+
+            try{
+                const solveRes = await solveParams(solveRequest)
+                let resultObj = await collectResults(solveRes)
+                return resultObj;
+                
+            }
+            catch(e){
+                console.log(e)
+                console.log(e.message)
+            }
         }
-        catch(e){
-            console.log(e)
-            console.log(e.message)
-        }
+        
     }
 
     // mount, call this method whenever this ui component is mounted
     useEffect(() => {
-
         const fetchData = async() => {
-            let resultObj = await Solve("value_list.gh");
-            setGlobalList([...globalList, resultObj])
+            if(definitionInfo.hasOwnProperty('inputs')){
+                let resultObj = await Solve(definitionInfo);
+                setGlobalList([...globalList, resultObj])
+            }
         }
         fetchData();
-    }, [])
+        
+    }, [definitionInfo])
+
+    useEffect(() => {
+        console.log(globalList)
+    },[globalList])
 
     // watcher, call this method whenever globalList is updated
     useEffect(() => {
-        
-        console.log(controls)
+
         // zoomCameraToSelection(camera, controls, scene);
 
     }, [scene.children])
