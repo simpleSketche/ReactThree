@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)microsoft.extensions.apidescription.server\6.0.5\build\Microsoft.Extensions.ApiDescription.Server.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.apidescription.server\6.0.5\build\Microsoft.Extensions.ApiDescription.Server.targets')" />
-    <Import Project="$(NuGetPackageRoot)rhinocommon\7.32.23221.10241\build\net48\RhinoCommon.targets" Condition="Exists('$(NuGetPackageRoot)rhinocommon\7.32.23221.10241\build\net48\RhinoCommon.targets')" />
-    <Import Project="$(NuGetPackageRoot)grasshopper\7.32.23221.10241\build\net48\Grasshopper.targets" Condition="Exists('$(NuGetPackageRoot)grasshopper\7.32.23221.10241\build\net48\Grasshopper.targets')" />
-  </ImportGroup>
-</Project>
