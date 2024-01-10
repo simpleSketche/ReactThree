@@ -41,7 +41,7 @@ function App() {
     <>
       <div style={canvasStyle}>
         {
-          show3d ? <World/> : 
+          show3d ? <World glb={selectedFile}/> : 
           <div>
             <h1>GLB viewer</h1>
             <div className="card">
