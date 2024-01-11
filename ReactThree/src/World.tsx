@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Canvas, useLoader, useThree } from "@react-three/fiber";
-import { MeshReflectorMaterial, Float, Text, Html, PivotControls, TransformControls, OrbitControls } from '@react-three/drei'
+import { MeshReflectorMaterial, Float, Text, Html, PivotControls, TransformControls, OrbitControls, useGLTF } from '@react-three/drei'
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react'
 import { useControls } from 'leva'
 
@@ -12,12 +12,30 @@ type glbProps = {
 const GlbMesh = ({glb, matrix}) => {
 
   const camera = useThree(state => state.camera)
-  console.log(THREE.Object3D.DEFAULT_UP)
   camera.up.set(0,0,1)
 
   const [url, setUrl] = useState();
 
-  const glbModel = url ? useLoader(GLTFLoader, url) : null;
+  const glbModel = url ? useGLTF(url) : null;
+  
+  // reset glbModel group center so that it can be rotated or re-positioned later
+  // Reset group center for later translate/rotate the furniture
+  const resetControlCenter = (group : any) => {
+    const box = new THREE.Box3().setFromObject(group);
+    const center = new THREE.Vector3();
+
+    box.getCenter(center);
+
+    const controlGroup = new THREE.Group();
+
+    controlGroup.position.copy(center);
+    group.position.sub(center);
+
+    controlGroup.add(group);
+    return controlGroup;
+  }
+
+  // glbModel.scene = resetControlCenter(glbModel.scene)
 
   useEffect(() => {
     const reader = new FileReader();
@@ -29,14 +47,17 @@ const GlbMesh = ({glb, matrix}) => {
 
   useEffect(() => {
     if (glbModel && matrix) {
-      glbModel.scene.rotation.set(0,0,Math.PI/2)
-      console.log(glbModel.scene)
+      
+      // rotate the glb model group to use z axis up
+      glbModel.scene.rotation.x = Math.PI / 2;
+
+      console.log(glbModel)
       glbModel.scene.matrix = matrix;
       glbModel.scene.matrixAutoUpdate = false;
     }
   },[glbModel, matrix])
 
-  return glbModel ? <primitive object ={glbModel.scene}/> : null;
+  return glbModel ? <primitive object ={glbModel.scene} /> : null;
 }
 
 const World: React.FC<glbProps> = ({glb}) => {
@@ -115,7 +136,7 @@ const World: React.FC<glbProps> = ({glb}) => {
 
         {/* <TransformControls object={ cube } /> */}
 
-        <mesh position-y={ 0 } rotation-x={ - Math.PI * 0.5 } scale={ 20 }>
+        <mesh position-y={ 0 }  scale={ 20 }>
             <planeGeometry/>
             <MeshReflectorMaterial
                 resolution={ 512 }
