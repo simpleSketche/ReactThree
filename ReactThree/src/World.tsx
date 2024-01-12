@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Canvas, useLoader, useThree } from "@react-three/fiber";
-import { MeshReflectorMaterial, Float, Text, Html, PivotControls, TransformControls, OrbitControls, useGLTF } from '@react-three/drei'
+import { MeshReflectorMaterial, Float, Text, Html, PivotControls, TransformControls, OrbitControls, useGLTF, useHelper } from '@react-three/drei'
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react'
 import { useControls } from 'leva'
 
@@ -9,7 +9,7 @@ type glbProps = {
   glb?: Object;
 }
 
-const GlbMesh = ({glb, matrix}) => {
+const GlbMesh = ({glb, matrix, rotation}) => {
 
   const camera = useThree(state => state.camera)
   camera.up.set(0,0,1)
@@ -32,10 +32,9 @@ const GlbMesh = ({glb, matrix}) => {
     group.position.sub(center);
 
     controlGroup.add(group);
+    console.log(controlGroup)
     return controlGroup;
   }
-
-  // glbModel.scene = resetControlCenter(glbModel.scene)
 
   useEffect(() => {
     const reader = new FileReader();
@@ -46,16 +45,24 @@ const GlbMesh = ({glb, matrix}) => {
   },[glb])
 
   useEffect(() => {
-    if (glbModel && matrix) {
-      
-      // rotate the glb model group to use z axis up
-      glbModel.scene.rotation.x = Math.PI / 2;
+    if (glbModel && matrix && rotation) {
 
-      console.log(glbModel)
-      glbModel.scene.matrix = matrix;
+      // rotate the glb model group to use z axis up
+      glbModel.scene.rotation.x = rotation;
+
+      const combinedMatrix = new THREE.Matrix4();
+
+      const rotationMatrix = new THREE.Matrix4();
+      rotationMatrix.makeRotationFromQuaternion(glbModel.scene.quaternion);
+
+      combinedMatrix.multiplyMatrices(rotationMatrix, matrix)
+
+      glbModel.scene.matrix = combinedMatrix;
       glbModel.scene.matrixAutoUpdate = false;
+
+      
     }
-  },[glbModel, matrix])
+  },[glbModel, matrix, rotation])
 
   return glbModel ? <primitive object ={glbModel.scene} /> : null;
 }
@@ -87,12 +94,16 @@ const World: React.FC<glbProps> = ({glb}) => {
           m31:{value: 0, min: -10, max: 10, step: 0.01},
           m32:{value: 0, min: -10, max: 10, step: 0.01},
           m33:{value: 1, min: -10, max: 10, step: 0.01},
+
+          rotation:{value:Math.PI / 2, min:-2, max:2, step: 0.01}
         }
       })
 
     const transition = useControls('transition', options)
   
     const trans = new THREE.Matrix4();
+
+    let rotation = transition.rotation
 
     useEffect(() => {
       if(transition){
@@ -102,10 +113,10 @@ const World: React.FC<glbProps> = ({glb}) => {
           transition.m20, transition.m21, transition.m22, transition.m23,
           transition.m30, transition.m31, transition.m32, transition.m33,
          )
+
+         rotation = transition.rotation
       }
     }, [transition])
-    
-    
 
     const cube = useCallback(node => {
       cube.current = node;
@@ -132,11 +143,11 @@ const World: React.FC<glbProps> = ({glb}) => {
             <meshStandardMaterial color="mediumpurple" />
         </mesh>
 
-        <GlbMesh glb={glb} matrix={trans}/>
+        <GlbMesh glb={glb} matrix={trans} rotation={rotation}/>
 
         {/* <TransformControls object={ cube } /> */}
 
-        <mesh position-y={ 0 }  scale={ 20 }>
+        <mesh position-z={ -2 }  scale={ 20 }>
             <planeGeometry/>
             <MeshReflectorMaterial
                 resolution={ 512 }
