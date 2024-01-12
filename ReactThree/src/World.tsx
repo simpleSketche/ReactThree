@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { Canvas, useLoader, useThree } from "@react-three/fiber";
 import { MeshReflectorMaterial, Float, Text, Html, PivotControls, TransformControls, OrbitControls, useGLTF, useHelper } from '@react-three/drei'
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react'
@@ -11,36 +12,41 @@ type glbProps = {
 
 const GlbMesh = ({glb, matrix, rotation}) => {
 
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath( 'https://www.gstatic.com/draco/versioned/decoders/1.5.5/' );
+  dracoLoader.preload();
+
   const camera = useThree(state => state.camera)
   camera.up.set(0,0,1)
 
-  const [url, setUrl] = useState();
+  const [glbModel, setGlbModel] = useState(null)
 
-  const glbModel = url ? useGLTF(url) : null;
-  
-  // reset glbModel group center so that it can be rotated or re-positioned later
-  // Reset group center for later translate/rotate the furniture
-  const resetControlCenter = (group : any) => {
-    const box = new THREE.Box3().setFromObject(group);
-    const center = new THREE.Vector3();
+  const loadGLB = (buffer) => {
+    const loader = new GLTFLoader();
 
-    box.getCenter(center);
+     // set up draco decoder in case the glb is compressed through draco
+    loader.setDRACOLoader(dracoLoader)
 
-    const controlGroup = new THREE.Group();
-
-    controlGroup.position.copy(center);
-    group.position.sub(center);
-
-    controlGroup.add(group);
-    console.log(controlGroup)
-    return controlGroup;
-  }
+    loader.parse(buffer, '', (glb) => {
+      // gltf is the loaded scene
+      // You can now add it to your Three.js scene
+      console.log(glb);
+      setGlbModel(glb)
+    }, (error) => {
+      console.error(error);
+    });
+  };
 
   useEffect(() => {
-    const reader = new FileReader();
-    reader.readAsDataURL(glb)
-    reader.onloadend = () => {
-      setUrl(reader.result)
+    
+    if(glb){
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(glb);
+        reader.onloadend = (e) => {
+        const buffer = e.target.result;
+        // Now you have the file as a buffer, you can load it with GLTFLoader
+        loadGLB(buffer);
+      };
     }
   },[glb])
 
@@ -138,23 +144,23 @@ const World: React.FC<glbProps> = ({glb}) => {
         <directionalLight position={ [ 1, 2, 3 ] } intensity={ 4.5 } />
         <ambientLight intensity={ 1.5 } />
 
-        <mesh ref={ cube }  >
+        {/* <mesh ref={ cube }  >
             <boxGeometry />
             <meshStandardMaterial color="mediumpurple" />
-        </mesh>
+        </mesh> */}
 
         <GlbMesh glb={glb} matrix={trans} rotation={rotation}/>
 
         {/* <TransformControls object={ cube } /> */}
 
-        <mesh position-z={ -2 }  scale={ 20 }>
+        <mesh position-z={ 0 }  scale={ 10 }>
             <planeGeometry/>
             <MeshReflectorMaterial
-                resolution={ 512 }
-                blur={ [ 1000, 1000 ] }
+                resolution={ 1080 }
+                blur={ [ 2000, 2000 ] }
                 mixBlur={ 1 }
-                mirror={ 0.5 }
-                color="greenyellow"
+                mirror={ 0.8 }
+                color="white"
             />
         </mesh>
         <axesHelper args={[5]}/>
