@@ -12,6 +12,8 @@ type glbProps = {
 
 const GlbMesh = ({glb, matrix, rotation}) => {
 
+  const meshRef = useRef(null);
+
   const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath( 'https://www.gstatic.com/draco/versioned/decoders/1.5.5/' );
   dracoLoader.preload();
@@ -20,6 +22,7 @@ const GlbMesh = ({glb, matrix, rotation}) => {
   camera.up.set(0,0,1)
 
   const [glbModel, setGlbModel] = useState(null)
+  
 
   const loadGLB = (buffer) => {
     const loader = new GLTFLoader();
@@ -63,6 +66,8 @@ const GlbMesh = ({glb, matrix, rotation}) => {
 
       combinedMatrix.multiplyMatrices(rotationMatrix, matrix)
 
+      console.log(combinedMatrix)
+
       glbModel.scene.matrix = combinedMatrix;
       glbModel.scene.matrixAutoUpdate = false;
 
@@ -70,10 +75,18 @@ const GlbMesh = ({glb, matrix, rotation}) => {
     }
   },[glbModel, matrix, rotation])
 
-  return glbModel ? <primitive object ={glbModel.scene} /> : null;
+  useEffect(() => {
+    console.log(meshRef)
+  },[meshRef.current])
+
+  return glbModel ? <primitive object ={glbModel.scene} ref={meshRef} /> : null;
 }
 
 const World: React.FC<glbProps> = ({glb}) => {
+
+      const meshRef = useRef(null);
+
+      const boxRef = useRef(null);
 
       useEffect(() => {
         THREE.Object3D.DEFAULT_UP.set(0,0,1)
@@ -113,6 +126,7 @@ const World: React.FC<glbProps> = ({glb}) => {
 
     useEffect(() => {
       if(transition){
+        console.log(transition)
         trans.set(
           transition.m00, transition.m01, transition.m02, transition.m03,
           transition.m10, transition.m11, transition.m12, transition.m13,
@@ -134,6 +148,29 @@ const World: React.FC<glbProps> = ({glb}) => {
         cube.current.matrixAutoUpdate = false;
       }
     })
+
+    useEffect(() => {
+      console.log(meshRef)
+    }, [meshRef.current])
+
+    useEffect(() => {
+      if(boxRef.current){
+        const trans = new THREE.Matrix4();
+
+        trans.set(
+          10,0,0,20,
+          0,10,0,0,
+          0,0,10,10,
+          0,0,0,1
+        )
+
+        console.log(trans)
+        
+        boxRef.current.applyMatrix4(trans);
+        boxRef.current.matrixAutoUpdate = false;
+        
+      }
+    }, [boxRef.current])
     
 
     return (
@@ -153,8 +190,29 @@ const World: React.FC<glbProps> = ({glb}) => {
 
         {/* <TransformControls object={ cube } /> */}
 
-        <mesh position-z={ 0 }  scale={ 10 }>
+        <mesh position={[20,0,10]}  scale={ 10 } ref={meshRef}>
             <planeGeometry/>
+            <MeshReflectorMaterial
+                resolution={ 1080 }
+                blur={ [ 2000, 2000 ] }
+                mixBlur={ 1 }
+                mirror={ 0.8 }
+                color="white"
+            />
+        </mesh>
+        <mesh  scale={ 10 } ref={boxRef}>
+            <boxGeometry/>
+            <MeshReflectorMaterial
+                resolution={ 1080 }
+                blur={ [ 2000, 2000 ] }
+                mixBlur={ 1 }
+                mirror={ 0.8 }
+                color="white"
+            />
+        </mesh>
+
+        <mesh ref={boxRef}>
+            <boxGeometry/>
             <MeshReflectorMaterial
                 resolution={ 1080 }
                 blur={ [ 2000, 2000 ] }
